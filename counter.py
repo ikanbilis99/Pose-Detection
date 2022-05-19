@@ -1,19 +1,36 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import PoseModule as pm
+import andrew_posemodule as pm #up to user's pose module file name
+
+import tkinter as tk
+from tkinter import ttk
+
+# choose workout
+def click(x):
+    global side
+    win.destroy()
+    side = x
 
 
+win = tk.Tk()
+win.title("Squat Counter")
+Lbl = ttk.Label(win, text="Choose your side")
+Lbl.pack()
+side = ""
 
-cap = cv2.VideoCapture('video3.mp4')
+left = ttk.Button(win, text="Left", command=lambda: click("Left"))
+right = ttk.Button(win, text="Right", command=lambda: click("Right"))
+left.pack()
+right.pack()
+
+win.mainloop()
+
+cap = cv2.VideoCapture('video path')
 detector = pm.poseDetector()
 count = 0
 direction = 0
 form = 0
-feedback = "Fix Form"
-
-side = input("Which side of my body is my video device? L/R: ")
-
 
 while cap.isOpened():
     ret, img = cap.read() #640 x 480
@@ -27,17 +44,17 @@ while cap.isOpened():
     # print(lmList)
     if len(lmList) != 0:
         
-        if side == 'L':
+        if side == 'Left':
             left_knee = detector.findAngle(img, 23, 25, 27)
             left_hip = detector.findAngle(img, 11, 23,25)
 
-        if side == 'R':
+        if side == 'Right':
             right_knee = detector.findAngle(img, 24, 26, 28)
             right_hip = detector.findAngle(img, 12, 24,26)
         
         #Percentage of success of squat
-        if side == 'L':
-            per = np.interp(left_hip, (45, 130), (0, 100))
+        if side == 'Left':
+            per = np.interp(left_hip, (45, 130), (100, 0))
             bar = np.interp(left_hip, (45, 130), (380, 50))
             # Bar to show squat progress
 
@@ -49,27 +66,21 @@ while cap.isOpened():
         
             #Check for full range of motion for the squat
             if form == 1:
-                if per == 0:
+                if per == 100:
                 
                     if left_hip < 45 and left_knee < 70:
-                        feedback = "Up"
+                        feedback = "Down"
                         if direction == 0:
                             count += 0.5
                             direction = 1
-
-                else:
-                    feedback = "Go Lower"
                         
-                if per == 100:
+                if per == 0:
                     if left_hip > 120 and left_knee > 140:
-                        feedback = "Down"
+                        feedback = "Up"
                         if direction == 1:
                             count += 0.5
                             direction = 0
 
-                else:
-                    feedback = "Fix Form"
-                            # form = 0
             
             #Draw Bar
             if form == 1:
@@ -91,8 +102,8 @@ while cap.isOpened():
 
 
                 
-        if side == 'R':
-            per = np.interp(right_hip, (45, 130), (0, 100))
+        if side == 'Right':
+            per = np.interp(right_hip, (45, 130), (100, 0))
             bar = np.interp(right_hip, (45, 130), (380, 50))
             # Bar to show squat progress
 
@@ -104,27 +115,19 @@ while cap.isOpened():
         
             #Check for full range of motion for the squat
             if form == 1:
-                if per == 0:
-                
+                if per == 100:
                     if right_hip < 45 and right_knee < 70:
-                        feedback = "Up"
+                        feedback = "Down"
                         if direction == 0:
                             count += 0.5
                             direction = 1
 
-                else:
-                    feedback = "Go Lower"
-                        
-                if per == 100:
+                if per == 0:
                     if right_hip > 120 and right_knee > 140:
-                        feedback = "Down"
+                        feedback = "Up"
                         if direction == 1:
                             count += 0.5
-                            direction = 0
-
-                else:
-                    feedback = "Fix Form"
-                            # form = 0            
+                            direction = 0 
     
         
         
@@ -147,7 +150,7 @@ while cap.isOpened():
                         (0, 255, 0), 2)
 
         
-    cv2.imshow('Pushup counter', img)
+    cv2.imshow('Squat counter', img)
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
         
