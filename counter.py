@@ -4,8 +4,7 @@ import numpy as np
 import PoseModule as pm
 
 
-
-cap = cv2.VideoCapture('video3.mp4')
+cap = cv2.VideoCapture('video5.mp4')
 detector = pm.poseDetector()
 count = 0
 direction = 0
@@ -13,7 +12,6 @@ form = 0
 feedback = "Fix Form"
 
 side = input("Which side of my body is my video device? L/R: ")
-
 
 while cap.isOpened():
     ret, img = cap.read() #640 x 480
@@ -40,12 +38,11 @@ while cap.isOpened():
             per = np.interp(left_hip, (45, 130), (0, 100))
             bar = np.interp(left_hip, (45, 130), (380, 50))
             # Bar to show squat progress
-
-
+            
+            
             #Check to ensure right form before starting the program
             if left_hip > 130 and left_knee > 160:
-                form = 1
-            
+                form = 1                  
         
             #Check for full range of motion for the squat
             if form == 1:
@@ -68,7 +65,7 @@ while cap.isOpened():
                             direction = 0
 
                 else:
-                    feedback = "Fix Form"
+                    feedback = "Go Lower"
                             # form = 0
             
             #Draw Bar
@@ -79,7 +76,7 @@ while cap.isOpened():
                             (255, 0, 0), 2)
 
 
-            #Pushup counter
+            #Squat counter
             cv2.rectangle(img, (0, 380), (100, 480), (0, 255, 0), cv2.FILLED)
             cv2.putText(img, str(int(count)), (25, 455), cv2.FONT_HERSHEY_PLAIN, 5,
                         (255, 0, 0), 5)
@@ -88,14 +85,13 @@ while cap.isOpened():
             cv2.rectangle(img, (500, 0), (640, 40), (255, 255, 255), cv2.FILLED)
             cv2.putText(img, feedback, (500, 40 ), cv2.FONT_HERSHEY_PLAIN, 2,
                         (0, 255, 0), 2)
-
-
+            
                 
         if side == 'R':
             per = np.interp(right_hip, (45, 130), (0, 100))
             bar = np.interp(right_hip, (45, 130), (380, 50))
             # Bar to show squat progress
-
+            
 
             #Check to ensure right form before starting the program
             if right_hip > 130 and right_knee > 160:
@@ -123,10 +119,9 @@ while cap.isOpened():
                             direction = 0
 
                 else:
-                    feedback = "Fix Form"
+                    feedback = "Go Lower"
                             # form = 0            
-    
-        
+                        
         
             #Draw Bar
             if form == 1:
@@ -147,7 +142,7 @@ while cap.isOpened():
                         (0, 255, 0), 2)
 
         
-    cv2.imshow('Pushup counter', img)
+    cv2.imshow('Squat counter', img)
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
         
